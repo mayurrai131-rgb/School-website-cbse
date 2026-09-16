@@ -1,0 +1,13 @@
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+enum Role { ADMIN TEACHER STUDENT PARENT }
+model User { id String @id @default(cuid()) email String @unique passwordHash String role Role createdAt DateTime @default(now()) updatedAt DateTime @updatedAt student Student? teacher Teacher? parent Parent? }
+model Student { id String @id @default(cuid()) userId String? @unique user User? name String studentId String @unique className String section String rollNumber String? createdAt DateTime @default(now()) results Result[] attendance Attendance[] }
+model Teacher { id String @id @default(cuid()) userId String? @unique user User? name String subjects String[] createdAt DateTime @default(now()) }
+model Parent { id String @id @default(cuid()) userId String? @unique user User? name String createdAt DateTime @default(now()) children Student[] }
+model Result { id String @id @default(cuid()) studentId String subject String exam String marks Float maxMarks Float grade String? createdAt DateTime @default(now()) student Student @relation(fields:[studentId],references:[id],onDelete:Cascade) @@index([studentId]) }
+model Attendance { id String @id @default(cuid()) studentId String date DateTime status String student Student @relation(fields:[studentId],references:[id],onDelete:Cascade) @@unique([studentId,date]) @@index([studentId]) }
+model Notice { id String @id @default(cuid()) title String content String published Boolean @default(true) createdAt DateTime @default(now()) }
+model Event { id String @id @default(cuid()) title String description String date DateTime createdAt DateTime @default(now()) }
+model AdmissionApplication { id String @id @default(cuid()) studentName String dateOfBirth DateTime? classApplying String parentName String phone String email String address String? previousSchool String? message String? status String @default("PENDING") createdAt DateTime @default(now()) @@index([status]) }
+model Message { id String @id @default(cuid()) senderId String recipientId String body String read Boolean @default(false) createdAt DateTime @default(now()) @@index([senderId,recipientId]) }
